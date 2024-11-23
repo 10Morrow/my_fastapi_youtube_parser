@@ -31,11 +31,6 @@ def validate_and_process_input(input_text: str, max_query_length: int = 100) -> 
     return queries
 
 
-# Пример использования:
-input_text = "Классика, как научиться играть на скрипке?, Музыкальная школа, флейта"
-queries = validate_and_process_input(input_text)
-print(queries)
-
 templates = Jinja2Templates(directory="templates")
 
 
