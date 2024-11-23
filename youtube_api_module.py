@@ -14,6 +14,7 @@ async def search_video(api_key: str, query: str, region_code: str = "US") -> dic
         "type": "video",
         "regionCode": region_code,
         "order": "viewCount",
+        "videoDuration": "medium",
         "publishedAfter": one_month_ago,
         "maxResults": 20,
         "key": api_key,
