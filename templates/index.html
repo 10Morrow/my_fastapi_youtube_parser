@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>YouTube Parser</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .video-wrapper {
+            position: relative;
+            width: 300px; /* Фиксированная ширина для стабильности */
+            height: 169px; /* Пропорции 16:9 */
+            background-color: #000; /* Черный фон до загрузки */
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .video-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .hidden {
+        display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Собранные данные</h1>
+
+    <!-- Фильтры -->
+    <div>
+        <label for="filter-min-views">Минимум просмотров:</label>
+        <input type="number" id="filter-min-views" placeholder="Минимум просмотров">
+
+        <label for="filter-max-views">Максимум просмотров:</label>
+        <input type="number" id="filter-max-views" placeholder="Максимум просмотров">
+    </div>
+    <div>
+        <label for="filter-min-subscribers">Минимум подписчиков:</label>
+        <input type="number" id="filter-min-subscribers" placeholder="Минимум подписчиков" value="100000">
+
+        <label for="filter-max-subscribers">Максимум подписчиков:</label>
+        <input type="number" id="filter-max-subscribers" placeholder="Максимум подписчиков">
+    </div>
+    <button id="apply-filter">Отфильтровать</button>
+    <!-- Таблица данных -->
+    <table>
+        <thead>
+            <tr>
+                <th>Видео</th>
+                <th>Просмотры</th>
+                <th>Подписчики</th>
+                <th>Монетизация</th>
+            </tr>
+        </thead>
+        <tbody id="video-table">
+            <!-- Эти данные должны быть переданы через шаблонизатор -->
+            {% for video_id, stats in data.items() %}
+            <tr>
+                <td>
+                    <div class="video-wrapper" onclick="loadVideo(this, '{{ video_id }}')">
+                        <img src="https://img.youtube.com/vi/{{ video_id }}/hqdefault.jpg" alt="Video Thumbnail">
+                    </div>
+                </td>
+                <td class="views">{{ stats.view_count }}</td>
+                <td class="subscribers">{{ stats.subscriberCount }}</td>
+                <td>{{ "Подключена" if stats.isMonetized else "Нету" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <script>
+        function loadVideo(wrapper, videoId) {
+            const iframe = document.createElement('iframe');
+            iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+            iframe.title = "YouTube video player";
+            iframe.frameBorder = "0";
+            iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+            iframe.referrerPolicy = "strict-origin-when-cross-origin";
+            iframe.allowFullscreen = true;
+
+            // Заменяем изображение на iframe
+            wrapper.innerHTML = ''; // Очищаем содержимое
+            wrapper.appendChild(iframe); // Добавляем iframe
+        }
+    </script>
+    <script>
+        document.getElementById("apply-filter").addEventListener("click", function () {
+            // Получаем минимальные и максимальные значения для фильтров
+            const minViews = parseInt(document.getElementById("filter-min-views").value) || 0;
+            const maxViews = parseInt(document.getElementById("filter-max-views").value) || Infinity;
+
+            const minSubscribers = parseInt(document.getElementById("filter-min-subscribers").value) || 0;
+            const maxSubscribers = parseInt(document.getElementById("filter-max-subscribers").value) || Infinity;
+
+            // Получаем все строки таблицы
+            const rows = document.querySelectorAll("#video-table tr");
+
+            rows.forEach(row => {
+                // Получаем количество просмотров и подписчиков из ячеек
+                const views = parseInt(row.querySelector(".views").textContent);
+                const subscribers = parseInt(row.querySelector(".subscribers").textContent);
+
+                // Проверяем условие: показываем или скрываем строку
+                if (
+                    views >= minViews && views <= maxViews &&
+                    subscribers >= minSubscribers && subscribers <= maxSubscribers
+                ) {
+                    row.classList.remove("hidden");
+                } else {
+                    row.classList.add("hidden");
+                }
+            });
+        });
+
+        // Устанавливаем значение по умолчанию для фильтра подписчиков при загрузке страницы
+        window.addEventListener("load", function () {
+            const defaultSubscribers = 100000;
+            document.getElementById("filter-min-subscribers").value = defaultSubscribers;
+
+            // Имитация нажатия кнопки для применения фильтра при загрузке
+            document.getElementById("apply-filter").click();
+        });
+    </script>
+    </body>
+</html>
