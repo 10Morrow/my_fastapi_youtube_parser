@@ -13,10 +13,10 @@ async def search_video(api_key: str, query: str, region_code: str = "US") -> dic
         "q": query,
         "type": "video",
         "regionCode": region_code,
-        "order": "viewCount",
+        "order": "relevance",
         "videoDuration": "medium",
         "publishedAfter": one_month_ago,
-        "maxResults": 20,
+        "maxResults": 30,
         "key": api_key,
     }
     async with aiohttp.ClientSession() as session:
