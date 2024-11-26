@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 API_KEY = 'AIzaSyC1kjO6Zsh7OAqipegtvOIQA6S6gMORyh0'
 
 
-async def search_video(api_key: str, query: str, region_code: str = "US") -> dict:
+async def search_video(api_key: str, query: str, region_code: str = "RU") -> dict:
     search_url = "https://www.googleapis.com/youtube/v3/search"
     one_month_ago = (datetime.now() - timedelta(days=30)).isoformat("T") + "Z"
     search_params = {
